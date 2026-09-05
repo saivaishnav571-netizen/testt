@@ -10,9 +10,14 @@ GSI landslide inventory, and ISRO flood inventory).
 
 import os
 import math
-import numpy as np
-import pandas as pd
-from scipy.spatial import cKDTree
+
+try:
+    import numpy as np
+    import pandas as pd
+    from scipy.spatial import cKDTree
+    HAS_SCIPY = True
+except ImportError:
+    HAS_SCIPY = False
 
 # ---------------------------------------------------------------------------
 # Configuration
@@ -36,7 +41,7 @@ _CACHE = {
 
 def _load_predictions():
     """Load the predictions CSV and build a spatial KDTree (once)."""
-    if _CACHE["loaded"]:
+    if _CACHE["loaded"] or not HAS_SCIPY:
         return
 
     candidate_paths = [
