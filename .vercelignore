@@ -1,0 +1,11 @@
+# Ignore heavy local ML datasets and raw files from Vercel deployment
+ml-model/
+frontend/node_modules/
+backend/__pycache__/
+api/__pycache__/
+*.pkl
+*.tif
+*.tiff
+*.gpkg
+*.osm.pbf
+*.csv
