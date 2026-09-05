@@ -13,8 +13,8 @@ export default function RoutePlanner() {
   const queryParams = new URLSearchParams(location.search);
   const destFromUrl = queryParams.get('dest');
 
-  const [source, setSource] = useState('Guwahati, Assam');
-  const [destination, setDestination] = useState('Silchar, Assam');
+  const [source, setSource] = useState('');
+  const [destination, setDestination] = useState('');
   const [sourceSuggestions, setSourceSuggestions] = useState<any[]>([]);
   const [destSuggestions, setDestSuggestions] = useState<any[]>([]);
   const [routes, setRoutes] = useState<any[]>([]);
@@ -118,7 +118,7 @@ export default function RoutePlanner() {
   };
 
   useEffect(() => {
-    if (destFromUrl) {
+    if (destFromUrl && source.trim()) {
       handleFindRoute();
     }
   }, [destFromUrl]);
