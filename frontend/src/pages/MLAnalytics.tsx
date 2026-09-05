@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { MapPin, Target, Cpu, Mountain, Droplets, CloudRain, ShieldCheck, AlertTriangle, Truck } from 'lucide-react';
 import axios from 'axios';
+import { API_BASE } from '../apiConfig';
 
-const API = ''; // Proxy handles this
+const API = API_BASE;
 
 export default function MLAnalytics() {
   const [lat, setLat] = useState('26.1445');

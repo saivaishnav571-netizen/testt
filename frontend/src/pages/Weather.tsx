@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { CloudRain, Wind, Eye, Gauge, Droplets, CloudLightning, Sun, CloudFog, AlertTriangle } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { API_BASE } from '../apiConfig';
 
 export default function Weather() {
   const [weather, setWeather] = useState<any>(null);
@@ -27,7 +28,7 @@ export default function Weather() {
           }
         }
 
-        const res = await axios.get(`/api/weather?lat=${lat}&lon=${lon}`);
+        const res = await axios.get(`${API_BASE}/api/weather?lat=${lat}&lon=${lon}`);
         if (res.data.status === 'success') {
           setWeather(res.data.data);
         } else {

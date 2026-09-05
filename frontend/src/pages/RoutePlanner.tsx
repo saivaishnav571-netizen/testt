@@ -4,8 +4,9 @@ import { MapPin, Navigation as NavIcon, AlertTriangle, ShieldCheck, CloudRain, M
 import LogisticsMapNavigation from '../components/LogisticsMapNavigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLocation } from 'react-router-dom';
+import { API_BASE } from '../apiConfig';
 
-const API = '';
+const API = API_BASE;
 
 export default function RoutePlanner() {
   const location = useLocation();

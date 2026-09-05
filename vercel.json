@@ -4,8 +4,8 @@
   "framework": "vite",
   "rewrites": [
     {
-      "source": "/api/(.*)",
-      "destination": "https://testt-jr39.onrender.com/api/$1"
+      "source": "/api/:path*",
+      "destination": "https://testt-jr39.onrender.com/api/:path*"
     },
     {
       "source": "/(.*)",
