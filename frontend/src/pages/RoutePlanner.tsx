@@ -310,9 +310,10 @@ export default function RoutePlanner() {
                 <div className="flex flex-col gap-1.5 max-h-36 overflow-y-auto pr-1">
                   {routes.map((r: any) => {
                     const isSelected = selectedRouteId === r.properties.route_id;
-                    const isBypass = r.properties.route_id === 'route_b';
-                    const isDirect = r.properties.route_id === 'route_a';
-                    const dotColor = isDirect ? 'bg-red-500' : isBypass ? 'bg-emerald-500' : 'bg-amber-500';
+                    const risk = r.properties.risk_level;
+                    const dotColor = risk === 'High Risk' ? 'bg-red-500 shadow-[0_0_6px_#ef4444]' : 
+                                     risk === 'Moderate Risk' ? 'bg-amber-500 shadow-[0_0_6px_#f59e0b]' : 
+                                     'bg-emerald-500 shadow-[0_0_6px_#10b981]';
 
                     return (
                       <button

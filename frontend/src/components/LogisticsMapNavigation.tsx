@@ -364,11 +364,21 @@ export const LogisticsMapNavigation: React.FC<LogisticsMapProps> = ({
           const segSourceId = `${id}_seg_${sIdx}`;
           const segGlowId = `${segSourceId}_glow`;
           const segLineId = `${segSourceId}_line`;
-          const isHighRisk = seg.risk_level === 'High Risk';
-          const isModRisk = seg.risk_level === 'Moderate Risk';
+          const isDanger = seg.color === '#ef4444' || seg.risk_level === 'Very High Risk' || seg.risk_level === 'High Risk';
+          const isCaution = seg.color === '#f59e0b' || seg.risk_level === 'Moderate Risk';
 
-          const mainColor = seg.color || (isHighRisk ? '#ef4444' : isModRisk ? '#f59e0b' : '#10b981');
-          const glowColor = isHighRisk ? '#f87171' : isModRisk ? '#fbbf24' : '#34d399';
+          let mainColor = '#10b981';
+          let glowColor = '#34d399';
+          if (seg.color === '#ef4444' || isDanger) {
+            mainColor = '#ef4444';
+            glowColor = '#f87171';
+          } else if (seg.color === '#f59e0b' || isCaution) {
+            mainColor = '#f59e0b';
+            glowColor = '#fbbf24';
+          } else {
+            mainColor = '#10b981';
+            glowColor = '#34d399';
+          }
 
           const geoData = {
             type: 'Feature',
@@ -396,15 +406,15 @@ export const LogisticsMapNavigation: React.FC<LogisticsMapProps> = ({
                 layout: { 'line-join': 'round', 'line-cap': 'round' },
                 paint: {
                   'line-color': glowColor,
-                  'line-width': isActive ? (isHighRisk ? 22 : 16) : 8,
-                  'line-opacity': isActive ? (isHighRisk ? 0.65 : 0.35) : 0.15,
-                  'line-blur': 6,
+                  'line-width': isActive ? (isDanger ? 22 : (isCaution ? 18 : 12)) : 0,
+                  'line-opacity': isActive ? (isDanger ? 0.65 : (isCaution ? 0.45 : 0.25)) : 0,
+                  'line-blur': 5,
                 },
               });
             } else {
               m.setPaintProperty(segGlowId, 'line-color', glowColor);
-              m.setPaintProperty(segGlowId, 'line-width', isActive ? (isHighRisk ? 22 : 16) : 8);
-              m.setPaintProperty(segGlowId, 'line-opacity', isActive ? (isHighRisk ? 0.65 : 0.35) : 0.15);
+              m.setPaintProperty(segGlowId, 'line-width', isActive ? (isDanger ? 22 : (isCaution ? 18 : 12)) : 0);
+              m.setPaintProperty(segGlowId, 'line-opacity', isActive ? (isDanger ? 0.65 : (isCaution ? 0.45 : 0.25)) : 0);
             }
             touchedLayers.add(segGlowId);
 
@@ -416,15 +426,15 @@ export const LogisticsMapNavigation: React.FC<LogisticsMapProps> = ({
                 source: segSourceId,
                 layout: { 'line-join': 'round', 'line-cap': 'round' },
                 paint: {
-                  'line-color': mainColor,
-                  'line-width': isActive ? (isHighRisk ? 8 : 6) : 4,
-                  'line-opacity': isActive ? 1 : 0.6,
+                  'line-color': isActive ? mainColor : '#94a3b8',
+                  'line-width': isActive ? (isDanger ? 8 : (isCaution ? 7 : 6)) : 4,
+                  'line-opacity': isActive ? 1 : 0.45,
                 },
               });
             } else {
-              m.setPaintProperty(segLineId, 'line-color', mainColor);
-              m.setPaintProperty(segLineId, 'line-width', isActive ? (isHighRisk ? 8 : 6) : 4);
-              m.setPaintProperty(segLineId, 'line-opacity', isActive ? 1 : 0.6);
+              m.setPaintProperty(segLineId, 'line-color', isActive ? mainColor : '#94a3b8');
+              m.setPaintProperty(segLineId, 'line-width', isActive ? (isDanger ? 8 : (isCaution ? 7 : 6)) : 4);
+              m.setPaintProperty(segLineId, 'line-opacity', isActive ? 1 : 0.45);
             }
             touchedLayers.add(segLineId);
           } catch (err) {
@@ -569,26 +579,39 @@ export const LogisticsMapNavigation: React.FC<LogisticsMapProps> = ({
         const hazardEl = document.createElement('div');
         hazardEl.className = 'hazard-map-marker';
         
-        // Determine color based on hazard type
-        let bgClass = "bg-red-500";
-        if (h.type === "flood") bgClass = "bg-blue-500";
-        else if (h.type === "landslide") bgClass = "bg-amber-600";
-        else if (h.type === "heavy_rain") bgClass = "bg-cyan-500";
+        let bgBadge = "bg-rose-950/90 border-rose-500 text-rose-200";
+        let dotColor = "bg-rose-500 shadow-[0_0_8px_#f43f5e]";
+        let iconEmoji = "⚠️";
+        
+        if (h.type === "flood") {
+          bgBadge = "bg-blue-950/90 border-blue-400 text-blue-200";
+          dotColor = "bg-blue-500 shadow-[0_0_8px_#3b82f6]";
+          iconEmoji = "🌊";
+        } else if (h.type === "landslide") {
+          bgBadge = "bg-amber-950/90 border-amber-500 text-amber-200";
+          dotColor = "bg-amber-500 shadow-[0_0_8px_#f59e0b]";
+          iconEmoji = "⛰️";
+        } else if (h.type === "heavy_rain") {
+          bgBadge = "bg-cyan-950/90 border-cyan-400 text-cyan-200";
+          dotColor = "bg-cyan-400 shadow-[0_0_8px_#22d3ee]";
+          iconEmoji = "🌧️";
+        }
         
         hazardEl.innerHTML = `
-          <div class="relative flex items-center justify-center w-8 h-8">
-            <div class="absolute inset-0 ${bgClass} rounded-full animate-ping opacity-75"></div>
-            <div class="absolute inset-1 ${bgClass} rounded-full border-2 border-white/50 shadow-[0_0_15px_rgba(255,0,0,0.8)] z-10"></div>
-            <div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-black/80 text-white text-[10px] font-bold px-2 py-1 rounded border border-white/20 whitespace-nowrap opacity-0 transition-opacity group-hover:opacity-100 z-20">
-              ${h.title}
+          <div class="flex flex-col items-center select-none cursor-pointer z-10 group">
+            <div class="flex items-center gap-1.5 px-2.5 py-1 ${bgBadge} rounded-full border shadow-xl backdrop-blur-md transition-all group-hover:scale-110">
+              <span class="text-xs">${iconEmoji}</span>
+              <span class="text-[10px] font-black tracking-tight uppercase">${h.title}</span>
+              <span class="text-[9px] bg-black/50 px-1.5 py-0.5 rounded-full font-bold text-white">${h.affected_stretch_km}km</span>
             </div>
+            <div class="w-0.5 h-2 ${dotColor.split(' ')[0]}"></div>
+            <div class="w-2.5 h-2.5 rounded-full ${dotColor} animate-ping"></div>
           </div>
         `;
-        // Make the outer div act as a group for the hover effect
-        hazardEl.classList.add('group', 'cursor-pointer');
+        hazardEl.classList.add('cursor-pointer');
         
         markersRef.current.push(
-          new maplibregl.Marker({ element: hazardEl, anchor: 'center' })
+          new maplibregl.Marker({ element: hazardEl, anchor: 'bottom' })
             .setLngLat(h.location as [number, number])
             .addTo(m)
         );
