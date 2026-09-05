@@ -521,6 +521,45 @@ export const LogisticsMapNavigation: React.FC<LogisticsMapProps> = ({
     const activeFeat = routeFeatures.find(f => f.properties.route_id === activeId) || routeFeatures[0];
     if (activeFeat && activeFeat.geometry.coordinates.length >= 2) {
       const coords = activeFeat.geometry.coordinates;
+      const waypoints = activeFeat.properties.waypoints || [];
+      const fromLabel = waypoints[0] || 'Origin';
+      const toLabel = waypoints[waypoints.length - 1] || 'Destination';
+
+      // ── Origin Marker (FROM) ──
+      const originEl = document.createElement('div');
+      originEl.className = 'flex flex-col items-center select-none cursor-pointer z-20 group';
+      originEl.innerHTML = `
+        <div class="flex items-center gap-1.5 px-3 py-1 bg-black/90 text-white rounded-full border-2 border-emerald-500 shadow-[0_4px_16px_rgba(16,185,129,0.5)] backdrop-blur-md transition-transform group-hover:scale-110">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_6px_#10b981]"></span>
+          <span class="text-[10px] font-black text-emerald-400 uppercase tracking-wider">FROM</span>
+          <span class="text-[11px] font-bold text-white max-w-[130px] truncate">${fromLabel}</span>
+        </div>
+        <div class="w-0.5 h-2 bg-emerald-500"></div>
+        <div class="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_#10b981]"></div>
+      `;
+      markersRef.current.push(
+        new maplibregl.Marker({ element: originEl, anchor: 'bottom' })
+          .setLngLat(coords[0] as [number, number])
+          .addTo(m)
+      );
+
+      // ── Destination Marker (TO) ──
+      const destEl = document.createElement('div');
+      destEl.className = 'flex flex-col items-center select-none cursor-pointer z-20 group';
+      destEl.innerHTML = `
+        <div class="flex items-center gap-1.5 px-3 py-1 bg-black/90 text-white rounded-full border-2 border-rose-500 shadow-[0_4px_16px_rgba(244,63,94,0.5)] backdrop-blur-md transition-transform group-hover:scale-110">
+          <span class="w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping shadow-[0_0_6px_#f43f5e]"></span>
+          <span class="text-[10px] font-black text-rose-400 uppercase tracking-wider">TO</span>
+          <span class="text-[11px] font-bold text-white max-w-[130px] truncate">${toLabel}</span>
+        </div>
+        <div class="w-0.5 h-2 bg-rose-500"></div>
+        <div class="w-1.5 h-1.5 rounded-full bg-rose-500 shadow-[0_0_6px_#f43f5e]"></div>
+      `;
+      markersRef.current.push(
+        new maplibregl.Marker({ element: destEl, anchor: 'bottom' })
+          .setLngLat(coords[coords.length - 1] as [number, number])
+          .addTo(m)
+      );
       
       // Add tactical hazard markers for the active route
       const hazards = activeFeat.properties.hazards || [];
